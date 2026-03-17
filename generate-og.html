@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html>
+<head><title>Generate OG Image</title></head>
+<body style="background:#000; display:flex; align-items:center; justify-content:center; min-height:100vh;">
+  <canvas id="c" width="1200" height="630"></canvas>
+  <script>
+    const c = document.getElementById('c');
+    const ctx = c.getContext('2d');
+
+    // Background
+    ctx.fillStyle = '#0A0A0A';
+    ctx.fillRect(0, 0, 1200, 630);
+
+    // Subtle gradient overlay
+    const grd = ctx.createLinearGradient(0, 0, 1200, 630);
+    grd.addColorStop(0, 'rgba(26, 10, 62, 0.4)');
+    grd.addColorStop(1, 'rgba(10, 10, 10, 0)');
+    ctx.fillStyle = grd;
+    ctx.fillRect(0, 0, 1200, 630);
+
+    // Title — "STARTING"
+    ctx.font = '900 72px Orbitron, sans-serif';
+    ctx.fillStyle = '#FFFFFF';
+    ctx.textAlign = 'center';
+    ctx.fillText('STARTING', 600, 260);
+
+    // Title — "BLOCK" in gradient (simulate with separate colours)
+    const gradient = ctx.createLinearGradient(400, 300, 800, 300);
+    gradient.addColorStop(0, '#00FFD1');
+    gradient.addColorStop(0.5, '#FF006B');
+    gradient.addColorStop(1, '#FFFF00');
+    ctx.fillStyle = gradient;
+    ctx.fillText('BLOCK', 600, 340);
+
+    // Tagline
+    ctx.font = '500 24px "Space Grotesk", sans-serif';
+    ctx.fillStyle = '#B0B0B0';
+    ctx.fillText('DAILY TRIVIA', 600, 400);
+
+    // Subtitle
+    ctx.font = '400 18px Inter, sans-serif';
+    ctx.fillStyle = '#555555';
+    ctx.fillText('Running  ·  Football  ·  Music  ·  Cities  ·  Nightlife', 600, 450);
+
+    // Download link
+    setTimeout(() => {
+      const link = document.createElement('a');
+      link.download = 'og-image.png';
+      link.href = c.toDataURL('image/png');
+      link.textContent = 'Download OG Image';
+      link.style.cssText = 'color: #00FFD1; font-size: 20px; display: block; text-align: center; margin-top: 20px;';
+      document.body.appendChild(link);
+    }, 500);
+  </script>
+</body>
+</html>
