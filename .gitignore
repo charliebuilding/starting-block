@@ -1,0 +1,5 @@
+# Local Netlify folder
+.netlify
+
+# Firebase config (contains API key)
+config.js
