@@ -1,4 +1,4 @@
-// Starting Block — Question Bank
+// Runnerdle — Question Bank
 // Categories: running, football, music, cities, nightlife, culture
 // Each question: { category, question, options[], answer (index), fact }
 

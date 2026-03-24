@@ -1,4 +1,4 @@
-// Starting Block — Game Logic
+// Runnerdle — Game Logic
 // Firebase + Speed Tracking + Weekly Leaderboard + Streak Tiers
 
 (function () {
@@ -469,7 +469,7 @@
     var tierStr = tier ? ' — ' + tier.name : '';
 
     var pbStr = (todayResult.correct && stats.pb !== null && todayResult.time <= stats.pb) ? '\n⚡ New PB!' : '';
-    var text = 'Starting Block #' + dayNum + ' ' + emoji + '\n' + word + timeStr + '\n🔥 ' + stats.streak + ' day streak' + tierStr + pbStr + '\n\nstartingblock.netlify.app';
+    var text = 'Runnerdle #' + dayNum + ' ' + emoji + '\n' + word + timeStr + '\n🔥 ' + stats.streak + ' day streak' + tierStr + pbStr + '\n\nstartingblock.netlify.app';
 
     if (navigator.share) {
       navigator.share({ text: text }).catch(function () { fallbackCopy(text); });
