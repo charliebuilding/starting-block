@@ -78,22 +78,64 @@
     return fmt(monday) + ' — ' + fmt(sunday);
   }
 
+  // ─── Cookie helpers (backup for WhatsApp in-app browser) ──
+  function setCookie(key, value, days) {
+    var d = new Date();
+    d.setTime(d.getTime() + (days * 86400000));
+    document.cookie = key + '=' + encodeURIComponent(value) + ';expires=' + d.toUTCString() + ';path=/;SameSite=Lax';
+  }
+
+  function getCookie(key) {
+    var match = document.cookie.match(new RegExp('(^| )' + key + '=([^;]+)'));
+    return match ? decodeURIComponent(match[2]) : '';
+  }
+
   // ─── Player ID ────────────────────────────────────────
   function getPlayerId() {
-    var id = localStorage.getItem('sb_player_id');
+    var id = localStorage.getItem('sb_player_id') || getCookie('sb_pid');
     if (!id) {
       id = 'sb_' + Date.now().toString(36) + '_' + Math.random().toString(36).substr(2, 6);
-      localStorage.setItem('sb_player_id', id);
     }
+    // Always persist in both localStorage and cookie
+    localStorage.setItem('sb_player_id', id);
+    setCookie('sb_pid', id, 365);
     return id;
   }
 
   function getPlayerName() {
-    return localStorage.getItem('sb_player_name') || '';
+    return localStorage.getItem('sb_player_name') || getCookie('sb_pname') || '';
   }
 
   function setPlayerName(name) {
-    localStorage.setItem('sb_player_name', name.trim().substring(0, 20));
+    var clean = name.trim().substring(0, 20);
+    localStorage.setItem('sb_player_name', clean);
+    setCookie('sb_pname', clean, 365);
+  }
+
+  // ─── Restore from Firebase if localStorage was wiped ──
+  function restoreFromFirebase(callback) {
+    var playerId = getPlayerId();
+    var localStats = localStorage.getItem('sb_stats');
+
+    // If we have a player ID (from cookie) but no local stats, pull from Firebase
+    if (!localStats) {
+      db.ref('starting-block/players/' + playerId).once('value', function (snap) {
+        var remote = snap.val();
+        if (remote && remote.name) {
+          // Restore name
+          setPlayerName(remote.name);
+          // Restore stats from what Firebase has
+          var stats = getStats();
+          stats.streak = remote.streak || 0;
+          stats.longestStreak = remote.longestStreak || 0;
+          stats.lastPlayed = remote.lastPlayed || null;
+          saveStats(stats);
+        }
+        callback();
+      });
+    } else {
+      callback();
+    }
   }
 
   // ─── Storage ──────────────────────────────────────────
@@ -681,12 +723,14 @@
   }
 
   function init() {
-    // Check if player has a name
-    if (!getPlayerName()) {
-      showNameModal(startGame);
-    } else {
-      startGame();
-    }
+    // Restore from Firebase if localStorage was cleared (e.g. WhatsApp in-app browser)
+    restoreFromFirebase(function () {
+      if (!getPlayerName()) {
+        showNameModal(startGame);
+      } else {
+        startGame();
+      }
+    });
   }
 
   // Go
